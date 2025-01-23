@@ -268,12 +268,12 @@ namespace NE3_Wireless_PC
                         Mat imgCv = Cv2.ImDecode(imageData, ImreadModes.Color);
                         if (!imgCv.Empty())
                         {
-                            var firstScreen = Screen.AllScreens[0];
+                            var firstScreen = Screen.AllScreens[Screen.AllScreens.Length -1];
                             int screenWidth = firstScreen.Bounds.Width;
                             int screenHeight = firstScreen.Bounds.Height;
                             Cv2.Resize(imgCv, imgCv, new OpenCvSharp.Size(screenWidth, screenHeight), 2.0, 2.0, InterpolationFlags.Linear);
-                            imgCv = RotateImage(imgCv, -currentAngle);
-
+                            imgCv = RotateImage(imgCv, -currentAngle - 90);
+                            imgCv = MirrorImage(imgCv, FlipMode.Y);
                             window.ShowImage(imgCv);
                             Cv2.WaitKey(2);
                         }
@@ -295,6 +295,12 @@ namespace NE3_Wireless_PC
                 ushort a = BitConverter.ToUInt16(new byte[] { receivedData[16], receivedData[17] }, 0);
                 currentAngle = a;
             }
+        }
+        private static Mat MirrorImage(Mat image, OpenCvSharp.FlipMode flipCode)
+        {
+            Mat mirroredImage = new Mat();
+            Cv2.Flip(image, mirroredImage, flipCode);
+            return mirroredImage;
         }
 
         private static Mat RotateImage(Mat image, double angle)
